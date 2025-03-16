@@ -149,16 +149,16 @@
             $("#codeDisplay").html(codeBlock);
         }
 
-        // Hapus kode
+        // Hapus kode pakai SweetAlert konfirmasi
         window.deleteCode = function (name) {
             Swal.fire({
-                title: "Apakah kamu yakin?",
+                title: "Apakah Anda yakin?",
                 text: "Kode ini akan dihapus selamanya!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#d33",
                 cancelButtonColor: "#3085d6",
-                confirmButtonText: "Ya, hapus!",
+                confirmButtonText: "Ya, Hapus!",
                 cancelButtonText: "Batal"
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -167,7 +167,13 @@
                     localStorage.setItem("codes", JSON.stringify(codes));
                     loadCodes();
                     $("#codeDisplay").empty();
-                    Swal.fire("Terhapus!", "Kode telah dihapus.", "success");
+                    Swal.fire({
+                        icon: "success",
+                        title: "Terhapus!",
+                        text: "Kode berhasil dihapus!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 }
             });
         };
