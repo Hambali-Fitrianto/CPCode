@@ -9,70 +9,75 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    <!-- Custom CSS -->
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f4f7f6;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-custom {
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .list-group-item {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .list-group-item:hover {
+            background-color: #f1f1f1;
         }
         .code-container {
             position: relative;
-            padding-top: 40px;
-        }
-        .copy-btn, .delete-btn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            border: none;
-            color: white;
-            padding: 6px 12px;
+            padding: 15px;
+            background: #f8f9fa;
             border-radius: 5px;
-            cursor: pointer;
+            border-left: 4px solid #007bff;
+            margin-top: 10px;
         }
-        .copy-btn {
-            background-color: #007bff;
-            right: 100px;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-        }
-        .copy-btn:hover {
-            background-color: #0056b3;
-        }
-        .delete-btn:hover {
-            background-color: #a71d2a;
-        }
-        pre {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .btn-copy, .btn-delete {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Share Code dengan Teman</h2>
+    <h2 class="text-center mb-4 text-primary">💻 Share Code dengan Teman</h2>
 
     <!-- Form Input -->
-    <div class="card mb-3">
-        <div class="card-header">Tambah Kode</div>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Tambah Kode</div>
         <div class="card-body">
             <div class="mb-3">
                 <label for="codeName" class="form-label">Nama Kode</label>
-                <input type="text" id="codeName" class="form-control" placeholder="Contoh: Script Alert">
+                <input type="text" id="codeName" class="form-control" placeholder="Contoh: Alert Script">
             </div>
             <div class="mb-3">
                 <label for="codeContent" class="form-label">Kode</label>
                 <textarea id="codeContent" class="form-control" rows="5" placeholder="Masukkan kode di sini"></textarea>
             </div>
-            <button class="btn btn-primary" id="saveCode">Simpan Kode</button>
+            <button class="btn btn-primary w-100 btn-custom" id="saveCode">💾 Simpan Kode</button>
         </div>
     </div>
 
     <!-- Daftar Kode -->
-    <h4>Daftar Kode:</h4>
+    <h4 class="text-secondary">📜 Daftar Kode:</h4>
     <ul class="list-group mb-3" id="codeList"></ul>
 
     <!-- Tempat Menampilkan Kode -->
@@ -121,7 +126,7 @@
             $.each(codes, function (name, content) {
                 let listItem = `<li class="list-group-item d-flex justify-content-between align-items-center">
                     ${name}
-                    <button class="btn btn-sm btn-primary show-code" data-name="${name}">Lihat</button>
+                    <button class="btn btn-sm btn-primary show-code" data-name="${name}">👀 Lihat</button>
                 </li>`;
                 $("#codeList").append(listItem);
             });
@@ -138,11 +143,15 @@
             let content = codes[name];
 
             let codeBlock = `<div class="card mt-3">
-                <div class="card-header">${name}</div>
-                <div class="card-body code-container">
-                    <button class="copy-btn" onclick="copyCode('${name}')">Copy</button>
-                    <button class="delete-btn" onclick="deleteCode('${name}')">Hapus</button>
-                    <pre><code id="code-${name}">${escapeHtml(content)}</code></pre>
+                <div class="card-header bg-secondary text-white">${name}</div>
+                <div class="card-body">
+                    <div class="code-container">
+                        <pre><code id="code-${name}">${escapeHtml(content)}</code></pre>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-success btn-copy btn-custom" onclick="copyCode('${name}')">📋 Copy</button>
+                        <button class="btn btn-danger btn-delete btn-custom" onclick="deleteCode('${name}')">🗑️ Hapus</button>
+                    </div>
                 </div>
             </div>`;
 
@@ -167,13 +176,7 @@
                     localStorage.setItem("codes", JSON.stringify(codes));
                     loadCodes();
                     $("#codeDisplay").empty();
-                    Swal.fire({
-                        icon: "success",
-                        title: "Terhapus!",
-                        text: "Kode berhasil dihapus!",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
+                    Swal.fire("Terhapus!", "Kode berhasil dihapus!", "success");
                 }
             });
         };
@@ -181,19 +184,14 @@
         // Copy kode dengan SweetAlert
         window.copyCode = function (name) {
             let text = document.getElementById(`code-${name}`).innerText;
-            let textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand("copy");
-            document.body.removeChild(textArea);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Kode berhasil disalin!',
-                showConfirmButton: false,
-                timer: 1500
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Kode berhasil disalin!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             });
         };
 
