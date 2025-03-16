@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Share Code</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .code-container {
+            position: relative;
+            padding-top: 40px;
+        }
+        .copy-btn, .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .copy-btn {
+            background-color: #007bff;
+            right: 90px;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        .delete-btn:hover {
+            background-color: #a71d2a;
+        }
+        pre {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Share Code dengan Teman</h2>
+
+    <!-- Form Input -->
+    <div class="card mb-3">
+        <div class="card-header">Tambah Kode</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="codeName" class="form-label">Nama Kode</label>
+                <input type="text" id="codeName" class="form-control" placeholder="Contoh: Script Alert">
+            </div>
+            <div class="mb-3">
+                <label for="codeContent" class="form-label">Kode</label>
+                <textarea id="codeContent" class="form-control" rows="5" placeholder="Masukkan kode di sini"></textarea>
+            </div>
+            <button class="btn btn-primary" id="saveCode">Simpan Kode</button>
+        </div>
+    </div>
+
+    <!-- Daftar Kode -->
+    <h4>Daftar Kode:</h4>
+    <ul class="list-group mb-3" id="codeList"></ul>
+
+    <!-- Tempat Menampilkan Kode -->
+    <div id="codeDisplay"></div>
+</div>
+
+<!-- jQuery & Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        loadCodes();
+
+        // Simpan kode
+        $("#saveCode").click(function () {
+            let name = $("#codeName").val().trim();
+            let content = $("#codeContent").val().trim();
+
+            if (name === "" || content === "") {
+                alert("Nama dan kode tidak boleh kosong!");
+                return;
+            }
+
+            let codes = JSON.parse(localStorage.getItem("codes")) || {};
+            codes[name] = content;
+            localStorage.setItem("codes", JSON.stringify(codes));
+
+            $("#codeName").val("");
+            $("#codeContent").val("");
+            loadCodes();
+        });
+
+        // Tampilkan daftar kode
+        function loadCodes() {
+            let codes = JSON.parse(localStorage.getItem("codes")) || {};
+            $("#codeList").empty();
+            $("#codeDisplay").empty();
+
+            $.each(codes, function (name, content) {
+                let listItem = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${name}
+                    <button class="btn btn-sm btn-primary show-code" data-name="${name}">Lihat</button>
+                </li>`;
+                $("#codeList").append(listItem);
+            });
+
+            $(".show-code").click(function () {
+                let name = $(this).data("name");
+                showCode(name);
+            });
+        }
+
+        // Tampilkan kode hanya untuk copy-paste, bukan untuk dijalankan
+        function showCode(name) {
+            let codes = JSON.parse(localStorage.getItem("codes")) || {};
+            let content = codes[name];
+
+            let codeBlock = `<div class="card mt-3">
+                <div class="card-header">${name}</div>
+                <div class="card-body code-container">
+                    <button class="copy-btn" onclick="copyCode('${name}')">Copy</button>
+                    <button class="delete-btn" onclick="deleteCode('${name}')">Hapus</button>
+                    <pre><code id="code-${name}">${escapeHtml(content)}</code></pre>
+                </div>
+            </div>`;
+
+            $("#codeDisplay").html(codeBlock);
+        }
+
+        // Hapus kode
+        window.deleteCode = function (name) {
+            let codes = JSON.parse(localStorage.getItem("codes")) || {};
+            delete codes[name];
+            localStorage.setItem("codes", JSON.stringify(codes));
+            loadCodes();
+            $("#codeDisplay").empty();
+        };
+
+        // Copy kode
+        window.copyCode = function (name) {
+            let text = document.getElementById(`code-${name}`).innerText;
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Kode berhasil disalin!");
+        };
+
+        // Fungsi untuk menghindari eksekusi HTML & JS
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;")
+                       .replace(/</g, "&lt;")
+                       .replace(/>/g, "&gt;")
+                       .replace(/"/g, "&quot;")
+                       .replace(/'/g, "&#039;");
+        }
+    });
+</script>
+
+</body>
+</html>
