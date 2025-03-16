@@ -12,46 +12,56 @@
     <!-- Custom CSS -->
     <style>
         body {
-            background-color: #f4f7f6;
+            background-color: #f8f9fa;
             font-family: 'Arial', sans-serif;
         }
         .container {
-            max-width: 800px;
+            max-width: 850px;
         }
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .btn-custom {
-            border-radius: 5px;
             font-weight: bold;
             transition: all 0.3s;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
         }
         .list-group-item {
             cursor: pointer;
             transition: 0.3s;
+            border-radius: 5px;
+            margin-bottom: 5px;
         }
         .list-group-item:hover {
-            background-color: #f1f1f1;
+            background-color: #e9ecef;
         }
         .code-container {
-            position: relative;
+            background: #f1f1f1;
             padding: 15px;
-            background: #f8f9fa;
             border-radius: 5px;
-            border-left: 4px solid #007bff;
-            margin-top: 10px;
+            border-left: 5px solid #007bff;
+            font-size: 14px;
+            overflow-x: auto;
         }
-        .btn-copy, .btn-delete {
-            margin-top: 10px;
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+        }
+        .code-header button {
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .code-header button:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -143,14 +153,16 @@
             let content = codes[name];
 
             let codeBlock = `<div class="card mt-3">
-                <div class="card-header bg-secondary text-white">${name}</div>
+                <div class="code-header">
+                    <span>${name}</span>
+                    <div>
+                        <button onclick="copyCode('${name}')">📋 Copy</button>
+                        <button onclick="deleteCode('${name}')">🗑️ Hapus</button>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="code-container">
                         <pre><code id="code-${name}">${escapeHtml(content)}</code></pre>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-success btn-copy btn-custom" onclick="copyCode('${name}')">📋 Copy</button>
-                        <button class="btn btn-danger btn-delete btn-custom" onclick="deleteCode('${name}')">🗑️ Hapus</button>
                     </div>
                 </div>
             </div>`;
