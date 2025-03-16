@@ -41,7 +41,9 @@
             border-radius: 5px;
             border-left: 5px solid #007bff;
             font-size: 14px;
-            overflow-x: auto;
+            max-height: 300px; /* Membatasi tinggi */
+            overflow-y: auto;  /* Scroll khusus kode */
+            white-space: pre-wrap;
         }
         .code-header {
             display: flex;
@@ -147,7 +149,7 @@
             });
         }
 
-        // Tampilkan kode hanya untuk copy-paste, bukan untuk dijalankan
+        // Tampilkan kode dengan scroll sendiri
         function showCode(name) {
             let codes = JSON.parse(localStorage.getItem("codes")) || {};
             let content = codes[name];
