@@ -35,21 +35,6 @@
         </div>
     </div>
 
-    <!-- Fitur Download Gambar -->
-    <div class="card mb-4 animate__animated animate__fadeInUp">
-        <div class="card-header bg-success text-white">📥 Download Gambar</div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label for="imageUrl" class="form-label">URL Gambar</label>
-                <input type="text" id="imageUrl" class="form-control" placeholder="Masukkan URL gambar (jpg/png)">
-            </div>
-            <div class="mb-3 text-center">
-                <img id="imagePreview" src="" alt="Preview Gambar" class="img-fluid d-none rounded border" style="max-height: 300px;">
-            </div>
-            <button class="btn btn-success w-100" id="downloadImage">⬇️ Download Gambar</button>
-        </div>
-    </div>
-
     <!-- Daftar Kode -->
     <h4 class="text-secondary animate__animated animate__fadeInLeft">📜 Daftar Kode:</h4>
     <ul class="list-group mb-3" id="codeList"></ul>
@@ -71,7 +56,6 @@
 
 <script>
 $(document).ready(function () {
-    // Simpan kode
     $('#saveCode').on('click', function () {
         const name = $('#codeName').val().trim();
         const code = $('#codeContent').val().trim();
@@ -81,46 +65,38 @@ $(document).ready(function () {
             return;
         }
 
-        const listItem = $('<li class="list-group-item list-group-item-action">')
-            .text(name)
-            .css('cursor', 'pointer')
-            .click(function () {
-                $('#codeDisplay').html(
-                    `<pre class="mt-3 p-3 bg-light border rounded"><code>${$('<div>').text(code).html()}</code></pre>`
-                );
-            });
+        // Elemen list dengan tombol download
+        const listItem = $('<li class="list-group-item d-flex justify-content-between align-items-center">');
 
+        // Teks nama kode yang bisa diklik untuk preview
+        const codeTitle = $('<span>').text(name).css('cursor', 'pointer').click(function () {
+            $('#codeDisplay').html(
+                `<pre class="mt-3 p-3 bg-light border rounded"><code>${$('<div>').text(code).html()}</code></pre>`
+            );
+        });
+
+        // Tombol download
+        const downloadBtn = $('<button class="btn btn-sm btn-outline-secondary">⬇️ Download</button>');
+        downloadBtn.click(function () {
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name.replace(/\s+/g, '_') + '.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        listItem.append(codeTitle).append(downloadBtn);
         $('#codeList').append(listItem);
+
+        // Bersihkan input
         $('#codeName').val('');
         $('#codeContent').val('');
-        Swal.fire('Sukses!', 'Kode berhasil ditambahkan.', 'success');
-    });
 
-    // Preview dan download gambar
-    $('#imageUrl').on('input', function () {
-        const url = $(this).val().trim();
-        if (url) {
-            $('#imagePreview').attr('src', url).removeClass('d-none');
-        } else {
-            $('#imagePreview').addClass('d-none').attr('src', '');
-        }
-    });
-
-    $('#downloadImage').on('click', function () {
-        const imageUrl = $('#imageUrl').val().trim();
-        if (imageUrl === '') {
-            Swal.fire('Oops!', 'Silakan masukkan URL gambar terlebih dahulu.', 'warning');
-            return;
-        }
-
-        const link = document.createElement('a');
-        link.href = imageUrl;
-        link.download = 'downloaded-image';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        Swal.fire('Berhasil!', 'Gambar sedang diunduh.', 'success');
+        Swal.fire('Sukses!', 'Kode berhasil ditambahkan dan bisa diunduh.', 'success');
     });
 });
 </script>
