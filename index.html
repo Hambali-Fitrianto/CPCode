@@ -11,15 +11,33 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Animate CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Custom Style -->
     <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
         .code-image-preview {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Fira Code', monospace;
             white-space: pre-wrap;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            font-size: 14px;
+            border: 1px solid #444;
+        }
+
+        .token-keyword { color: #569CD6; }
+        .token-string { color: #CE9178; }
+        .token-function { color: #DCDCAA; }
+        .token-comment { color: #6A9955; font-style: italic; }
+
+        .footer {
+            background: #f8f9fa;
+            margin-top: 40px;
         }
     </style>
 </head>
@@ -72,6 +90,14 @@
 $(document).ready(function () {
     let currentCodeName = '';
 
+    function syntaxHighlight(code) {
+        return code
+            .replace(/(\/\/[^\n]*)/g, '<span class="token-comment">$1</span>')
+            .replace(/("(?:\\.|[^"\\])*")/g, '<span class="token-string">$1</span>')
+            .replace(/\b(const|let|var|function|return|if|else|for|while|class|new|import|from)\b/g, '<span class="token-keyword">$1</span>')
+            .replace(/\b(console|alert|log|prompt|document|window)\b/g, '<span class="token-function">$1</span>');
+    }
+
     $('#saveCode').on('click', function () {
         const name = $('#codeName').val().trim();
         const code = $('#codeContent').val().trim();
@@ -84,7 +110,8 @@ $(document).ready(function () {
         const listItem = $('<li class="list-group-item d-flex justify-content-between align-items-center">');
 
         const codeTitle = $('<span>').text(name).css('cursor', 'pointer').click(function () {
-            $('#codeDisplay').text(code).removeClass('d-none');
+            const highlighted = syntaxHighlight($('<div>').text(code).html());
+            $('#codeDisplay').html(highlighted).removeClass('d-none');
             $('#downloadAsImage').removeClass('d-none');
             currentCodeName = name;
         });
